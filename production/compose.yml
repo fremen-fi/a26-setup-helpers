@@ -14,6 +14,8 @@ services:
       - /run/liquidsoap:/run/liquidsoap:rw
       # log path
       - /var/log/radio-10.log:/var/log/radio-10.log
+      # audio log
+      - /opt/archive:/opt/archive:rw
 
     # Optional: override script path without rebuilding (hotfixes)
     # environment:
