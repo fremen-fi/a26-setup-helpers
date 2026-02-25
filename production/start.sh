@@ -30,25 +30,28 @@ docker compose -f "$SCRIPT_DIR/compose.yml" ps
 echo ""
 echo "--- Pulling utility scripts ---"
 
-sudo curl -L -H "Authorization: token $git_pat" \
-  "https://github.com/$git_user/$git_repo_name/releases/latest/download/gatherer" \
-  -o /usr/local/bin/gatherer
-sudo chmod +x /usr/local/bin/gatherer
+get_asset_url() {
+  local name=$1
+  curl -s -H "Authorization: token $git_pat" \
+    "https://api.github.com/repos/$git_user/$git_repo_name/releases/latest" \
+    | grep -A2 "\"name\": \"$name\"" | grep '"url"' | head -1 | cut -d'"' -f4
+}
 
-sudo curl -L -H "Authorization: token $git_pat" \
-  "https://github.com/$git_user/$git_repo_name/releases/latest/download/newsweather" \
-  -o /usr/local/bin/newsweather
-sudo chmod +x /usr/local/bin/newsweather
+download_asset() {
+  local name=$1
+  local dest=$2
+  local url
+  url=$(get_asset_url "$name")
+  sudo curl -sL -H "Authorization: token $git_pat" \
+    -H "Accept: application/octet-stream" \
+    "$url" -o "$dest"
+  sudo chmod +x "$dest"
+}
 
-sudo curl -L -H "Authorization: token $git_pat" \
-  "https://github.com/$git_user/$git_repo_name/releases/latest/download/logger" \
-  -o /usr/local/bin/logger
-sudo chmod +x /usr/local/bin/logger
-
-sudo curl -L -H "Authorization: token $git_pat" \
-  "https://github.com/$git_user/$git_repo_name/releases/latest/download/archiver" \
-  -o /usr/local/bin/archiver
-sudo chmod +x /usr/local/bin/archiver
+download_asset "gatherer"    /usr/local/bin/gatherer
+download_asset "newsweather" /usr/local/bin/newsweather
+download_asset "logger"      /usr/local/bin/logger
+download_asset "archiver"    /usr/local/bin/archiver
 
 echo "--- writing crontab ---"
 crontab -u liq-user ~/a26-setup-helpers/crontab
