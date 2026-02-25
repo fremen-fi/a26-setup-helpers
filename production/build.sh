@@ -88,8 +88,8 @@ sudo mkdir -p /radio /radio-util
 FSTAB_RADIO="//${cifs_server}/radio /radio cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
 FSTAB_UTIL="//${cifs_server}/backup /radio-util cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
 
-echo "$FSTAB_RADIO" | sudo tee -a /etc/fstab > /dev/null
-echo "$FSTAB_UTIL"  | sudo tee -a /etc/fstab > /dev/null
+grep -q "/radio cifs" /etc/fstab || echo "$FSTAB_RADIO" | sudo tee -a /etc/fstab > /dev/null
+grep -q "/radio-util cifs" /etc/fstab || echo "$FSTAB_UTIL" | sudo tee -a /etc/fstab > /dev/null
 
 sudo systemctl daemon-reload
 sudo mount /radio
