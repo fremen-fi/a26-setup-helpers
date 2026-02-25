@@ -95,6 +95,8 @@ sudo systemctl daemon-reload
 sudo mount /radio
 sudo mount /radio-util
 
+sudo usermod -aG docker liq-user
+
 # Docker login
 echo "$git_pat" | docker login ghcr.io -u "$git_user" --password-stdin
 
