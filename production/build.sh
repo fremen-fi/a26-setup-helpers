@@ -32,10 +32,6 @@ printf "HLS access token (shared with CDN): "
 read -r -s hls_token
 echo ""
 
-# write to apache envvars
-echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/null
-sudo systemctl reload apache2
-
 # CIFS credentials
 while true; do
     printf "CIFS username: "
@@ -75,6 +71,10 @@ sudo chown -R "$HLS_OWNER":"$HLS_OWNER" /var/www/hls
 
 # Apache config
 sudo cp 000-default.conf /etc/apache2/sites-available/000-default.conf
+sudo systemctl reload apache2
+
+# write to apache envvars
+echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/null
 sudo systemctl reload apache2
 
 # CIFS credentials file
