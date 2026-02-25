@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 echo "=== AirCore A26 Station Deploy ==="
 echo ""
 
