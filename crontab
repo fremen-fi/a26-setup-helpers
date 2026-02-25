@@ -1,0 +1,4 @@
+25 4,8,15,16 * * * /usr/local/bin/gatherer
+42 5,8,11,14,17,20 * * * /usr/local/bin/newsweather news
+43 5,8,11,14,17,20 * * * /usr/local/bin/newsweather weather
+2 * * * * /usr/local/bin/archiver
