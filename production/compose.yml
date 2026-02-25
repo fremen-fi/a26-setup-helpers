@@ -1,6 +1,6 @@
 services:
   radio-10:
-    image: radio-10:latest
+    image: ghcr.io/mikasappi/radio-10:latest
     container_name: radio-10
     restart: unless-stopped
 
