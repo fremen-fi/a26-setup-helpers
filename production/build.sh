@@ -39,7 +39,7 @@ while true; do
     printf "CIFS password: "
     read -r -s cifs_password
     echo ""
-    printf "CIFS server address (e.g. //u490804.your-storagebox.de): "
+    printf "CIFS HOST NAME (e.g. u490804.your-storagebox.de): "
     read -r cifs_server
     printf "user: $cifs_user, server: $cifs_server. Correct? (Y/N) "
     read -r cifs_confirm
@@ -85,8 +85,8 @@ sudo chmod 600 /etc/cifs-credentials
 # fstab mounts
 sudo mkdir -p /radio /radio-util
 
-FSTAB_RADIO="${cifs_server}/radio /radio cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
-FSTAB_UTIL="${cifs_server}/backup /radio-util cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
+FSTAB_RADIO="//${cifs_server}/radio /radio cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
+FSTAB_UTIL="//${cifs_server}/backup /radio-util cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
 
 echo "$FSTAB_RADIO" | sudo tee -a /etc/fstab > /dev/null
 echo "$FSTAB_UTIL"  | sudo tee -a /etc/fstab > /dev/null
