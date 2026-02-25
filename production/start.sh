@@ -48,6 +48,10 @@ download_asset() {
   sudo chmod +x "$dest"
 }
 
+echo "Testing asset resolution..."
+url=$(get_asset_url "newsweather")
+echo "Resolved URL: $url"
+
 download_asset "gatherer"    /usr/local/bin/gatherer
 download_asset "newsweather" /usr/local/bin/newsweather
 download_asset "logger"      /usr/local/bin/logger
