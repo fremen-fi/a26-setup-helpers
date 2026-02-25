@@ -29,6 +29,7 @@ docker compose -f "$SCRIPT_DIR/compose.yml" ps
 
 echo ""
 echo "--- Pulling utility scripts ---"
+
 sudo curl -L -H "Authorization: token $git_pat" \
   "https://github.com/$git_user/$git_repo_name/releases/latest/download/gatherer" \
   -o /usr/local/bin/gatherer
@@ -43,3 +44,11 @@ sudo curl -L -H "Authorization: token $git_pat" \
   "https://github.com/$git_user/$git_repo_name/releases/latest/download/logger" \
   -o /usr/local/bin/logger
 sudo chmod +x /usr/local/bin/logger
+
+sudo curl -L -H "Authorization: token $git_pat" \
+  "https://github.com/$git_user/$git_repo_name/releases/latest/download/archiver" \
+  -o /usr/local/bin/archiver
+sudo chmod +x /usr/local/bin/archiver
+
+echo "--- writing crontab ---"
+crontab -u liq-user ~/a26-setup-helpers/crontab
