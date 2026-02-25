@@ -31,8 +31,8 @@ echo "--- Pulling utility scripts ---"
 get_asset_url() {
   local name=$1
   curl -s -H "Authorization: token $git_pat" \
-    "https://api.github.com/repos/$git_user/$git_repo_name/releases/latest" \
-    | jq -r ".assets[] | select(.name==\"$name\") | .url"
+    "https://api.github.com/repos/$git_user/$git_repo_name/releases?per_page=50" \
+    | jq -r "[.[] | .assets[] | select(.name==\"$name\")][0].url"
 }
 
 download_asset() {
