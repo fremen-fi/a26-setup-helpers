@@ -91,6 +91,8 @@ FSTAB_UTIL="//${cifs_server}/backup /radio-util cifs credentials=/etc/cifs-crede
 grep -q "/radio cifs" /etc/fstab || echo "$FSTAB_RADIO" | sudo tee -a /etc/fstab > /dev/null
 grep -q "/radio-util cifs" /etc/fstab || echo "$FSTAB_UTIL" | sudo tee -a /etc/fstab > /dev/null
 
+sudo mkdir -p /radio /radio-util
+
 sudo systemctl daemon-reload
 sudo mount /radio
 sudo mount /radio-util
