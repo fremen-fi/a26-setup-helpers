@@ -26,3 +26,20 @@ docker compose -f "$SCRIPT_DIR/compose.yml" up -d
 echo ""
 echo "--- Deploy complete ---"
 docker compose -f "$SCRIPT_DIR/compose.yml" ps
+
+echo ""
+echo "--- Pulling utility scripts ---"
+sudo curl -L -H "Authorization: token $git_pat" \
+  "https://github.com/$git_user/$git_repo_name/releases/latest/download/gatherer" \
+  -o /usr/local/bin/gatherer
+sudo chmod +x /usr/local/bin/gatherer
+
+sudo curl -L -H "Authorization: token $git_pat" \
+  "https://github.com/$git_user/$git_repo_name/releases/latest/download/newsweather" \
+  -o /usr/local/bin/newsweather
+sudo chmod +x /usr/local/bin/newsweather
+
+sudo curl -L -H "Authorization: token $git_pat" \
+  "https://github.com/$git_user/$git_repo_name/releases/latest/download/logger" \
+  -o /usr/local/bin/logger
+sudo chmod +x /usr/local/bin/logger
