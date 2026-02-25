@@ -34,7 +34,7 @@ get_asset_url() {
   local name=$1
   curl -s -H "Authorization: token $git_pat" \
     "https://api.github.com/repos/$git_user/$git_repo_name/releases/latest" \
-    | grep -A2 "\"name\": \"$name\"" | grep '"url"' | head -1 | cut -d'"' -f4
+    | jq -r ".assets[] | select(.name==\"$name\") | .url"
 }
 
 download_asset() {
