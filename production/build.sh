@@ -68,6 +68,7 @@ sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2
 # HLS directory
 sudo mkdir -p /var/www/hls
 sudo chown -R "$HLS_OWNER":"$HLS_OWNER" /var/www/hls
+sudo touch /var/www/hls/.keep
 
 # Apache config
 sudo cp 000-default.conf /etc/apache2/sites-available/000-default.conf
