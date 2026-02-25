@@ -12,6 +12,8 @@ services:
       - /var/www/hls:/var/www/hls:rw
       # Liquidsoap socket (for telnet/monitoring access from host)
       - /run/liquidsoap:/run/liquidsoap:rw
+      # log path
+      - /var/log/radio-10.log:/var/log/radio-10.log
 
     # Optional: override script path without rebuilding (hotfixes)
     # environment:
