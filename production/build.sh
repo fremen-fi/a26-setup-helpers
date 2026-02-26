@@ -81,6 +81,11 @@ sudo touch /opt/archive/.keep
 sudo cp 000-default.conf /etc/apache2/sites-available/000-default.conf
 sudo systemctl reload apache2
 
+# systemd
+sudo cp a26-archiver.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable a26-archiver --now
+
 # write to apache envvars
 echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/null
 sudo systemctl reload apache2

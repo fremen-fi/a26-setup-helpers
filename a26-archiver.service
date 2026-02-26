@@ -1,0 +1,18 @@
+[Unit]
+Description=AirCore A26 Archiver
+After=network.target
+Documentation=WITHHELD
+
+[Service]
+Type=simple
+User=liq-user
+WorkingDirectory=/opt/archive
+ExecStartPre=/bin/sleep 120
+ExecStart=/usr/local/bin/archiver
+Restart=always
+StartLimitInterval=90
+Nice=-12
+
+[Install]
+WantedBy=multi-user.target
+Alias=a26-archiver.service
