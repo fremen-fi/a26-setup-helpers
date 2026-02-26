@@ -65,3 +65,6 @@ download_asset "archiver"    /usr/local/bin/archiver
 
 echo "--- writing crontab ---"
 crontab -u $username ~/a26-setup-helpers/crontab
+
+echo "--- starting systemd services ---"
+sudo systemctl enable a26-archiver --now

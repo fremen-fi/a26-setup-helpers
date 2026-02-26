@@ -69,13 +69,13 @@ sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2 jq
 
 # HLS directory
 sudo mkdir -p /var/www/hls
-sudo chown -R 1001:1001 /var/www/hls
 sudo touch /var/www/hls/.keep
+sudo chown -R 1001:1001 /var/www/hls
 
 # Audio log directory
 sudo mkdir -p /opt/archive
-sudo chown -R 1001:1001 /opt/archive
 sudo touch /opt/archive/.keep
+sudo chown -R 1001:1001 /opt/archive
 
 # Apache config
 sudo cp 000-default.conf /etc/apache2/sites-available/000-default.conf
@@ -84,7 +84,6 @@ sudo systemctl reload apache2
 # systemd
 sudo cp a26-archiver.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable a26-archiver --now
 
 # write to apache envvars
 echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/null
