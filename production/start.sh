@@ -4,6 +4,14 @@ echo "=== AirCore A26 Station Deploy ==="
 echo ""
 
 while true; do
+    printf "What was the username you chose to be the owner of the HLS directory?: "
+    read -r username
+    printf "user: $username. Correct? (Y/N) "
+    read -r confirm_username
+    [[ ""$confirm_username =~ ^[yY]$ ]] && break
+done
+
+while true; do
     printf "GitHub username: "
     read -r git_user
     printf "GitHub repo name (without slashes): "
@@ -56,4 +64,4 @@ download_asset "logger"      /usr/local/bin/logger
 download_asset "archiver"    /usr/local/bin/archiver
 
 echo "--- writing crontab ---"
-crontab -u liq-user ~/a26-setup-helpers/crontab
+crontab -u $username ~/a26-setup-helpers/crontab
