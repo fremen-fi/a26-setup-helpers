@@ -58,7 +58,7 @@ while true; do
     [[ "$git_confirm" =~ ^[yY]$ ]] && break
 done
 
-echo "$git_pat" | sudo tee -a /etc/environment
+echo "git_pat=$git_pat" | sudo tee -a /etc/environment
 
 echo ""
 echo "--- Starting installation ---"
