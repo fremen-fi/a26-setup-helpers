@@ -65,7 +65,7 @@ echo "--- Starting installation ---"
 
 # apt
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2
+sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2 jq
 
 # HLS directory
 sudo mkdir -p /var/www/hls
@@ -111,7 +111,7 @@ sudo mount /radio-util
 sudo usermod -aG docker liq-user
 
 sudo touch /var/log/radio-10.log
-sudo chown liq-user:liq-user /var/log/radio-10.log
+sudo chown 1001:1001 /var/log/radio-10.log
 
 # Docker login
 echo "$git_pat" | docker login ghcr.io -u "$git_user" --password-stdin
