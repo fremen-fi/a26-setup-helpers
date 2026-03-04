@@ -58,6 +58,21 @@ while true; do
     [[ "$git_confirm" =~ ^[yY]$ ]] && break
 done
 
+# Grafana Cloud credentials (for Prometheus remote_write)
+while true; do
+    printf "Grafana Cloud remote_write username: "
+    read -r grafana_user
+    printf "Grafana Cloud remote_write API key: "
+    read -r -s grafana_key
+    echo ""
+    printf "Grafana user: $grafana_user. Correct? (Y/N) "
+    read -r grafana_confirm
+    [[ "$grafana_confirm" =~ ^[yY]$ ]] && break
+done
+
+printf "Server label (e.g. audio-server-hel1-2): "
+read -r server_label
+
 echo "git_pat=$git_pat" | sudo tee -a /etc/environment
 
 echo ""
@@ -106,6 +121,137 @@ grep -q "/radio-util cifs" /etc/fstab || echo "$FSTAB_UTIL" | sudo tee -a /etc/f
 sudo systemctl daemon-reload
 sudo mount /radio
 sudo mount /radio-util
+
+# Prometheus
+PROM_VERSION="3.2.1"
+PROM_ARCH="linux-amd64"
+PROM_TAR="prometheus-${PROM_VERSION}.${PROM_ARCH}.tar.gz"
+wget -q "https://github.com/prometheus/prometheus/releases/download/v${PROM_VERSION}/${PROM_TAR}" -O /tmp/${PROM_TAR}
+tar xzf /tmp/${PROM_TAR} -C /tmp
+
+sudo mkdir -p /opt/prometheus/rules
+sudo cp /tmp/prometheus-${PROM_VERSION}.${PROM_ARCH}/prometheus /opt/prometheus/
+sudo cp /tmp/prometheus-${PROM_VERSION}.${PROM_ARCH}/promtool /opt/prometheus/
+rm -rf /tmp/prometheus-${PROM_VERSION}* /tmp/${PROM_TAR}
+
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin prometheus || true
+sudo chown -R prometheus:prometheus /opt/prometheus
+
+cat <<EOF | sudo tee /opt/prometheus/prometheus.yml > /dev/null
+global:
+  scrape_interval: 15s
+rule_files:
+  - "rules/lufs.yml"
+remote_write:
+  - url: https://prometheus-prod-39-prod-eu-north-0.grafana.net/api/prom/push
+    basic_auth:
+      username: "${grafana_user}"
+      password: "${grafana_key}"
+    write_relabel_configs:
+      # Only send critical audio metrics for alerting
+      - source_labels: [__name__]
+        regex: 'liquidsoap_output_lufs_1h_avg|liquidsoap_output_lufs_24h_avg|liquidsoap_output_lufs_7d_avg|liquidsoap_output_lufs_3s|liquidsoap_dead_air.*|up|liquidsoap_rms_db'
+        action: keep
+      # Add server identification
+      - target_label: server
+        replacement: '${server_label}'
+      - target_label: environment
+        replacement: 'production'
+scrape_configs:
+  # Fast scraping for audio metrics (LUFS + RMS)
+  - job_name: 'liquidsoap_audio'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 10s
+    metric_relabel_configs:
+      - source_labels: ['__name__']
+        regex: 'liquidsoap_output_lufs_3s|liquidsoap_rms_db|liquidsoap_dead_air.*'
+        action: keep
+  # Normal scraping for other metrics
+  - job_name: 'liquidsoap_other'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+    metric_relabel_configs:
+      - source_labels: ['__name__']
+        regex: 'liquidsoap_output_lufs_3s|liquidsoap_rms_db|liquidsoap_dead_air.*'
+        action: drop
+  # Catchup metrics
+  - job_name: 'liquidsoap_catchup'
+    static_configs:
+      - targets: ['localhost:9093']
+    scrape_interval: 15s
+  # Playlist position metrics
+  - job_name: 'playlist_positions'
+    static_configs:
+      - targets: ['localhost:9094']
+    scrape_interval: 15s
+  # RSS feed health monitoring
+  - job_name: 'feed_health'
+    static_configs:
+      - targets: ['localhost:9095']
+    scrape_interval: 60s
+  # Content validation monitoring
+  - job_name: 'content_validation'
+    static_configs:
+      - targets: ['localhost:9096']
+    scrape_interval: 30s
+EOF
+
+cat <<'RULES_EOF' | sudo tee /opt/prometheus/rules/lufs.yml > /dev/null
+groups:
+  - name: lufs_processing
+    interval: 30s
+    rules:
+      # Clean LUFS metric (filters out NaN, infinite, and extreme values)
+      - record: liquidsoap_output_lufs_clean
+        expr: |
+          liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
+          and on() (
+            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} == liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
+          )
+          and on() (
+            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} > -100
+          )
+          and on() (
+            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} < 50
+          )
+      # 1 hour rolling average
+      - record: liquidsoap_output_lufs_1h_avg
+        expr: avg_over_time(liquidsoap_output_lufs_clean[1h])
+      # 24 hour rolling average
+      - record: liquidsoap_output_lufs_24h_avg
+        expr: avg_over_time(liquidsoap_output_lufs_clean[24h])
+      # 7 day rolling average for long-term trends
+      - record: liquidsoap_output_lufs_7d_avg
+        expr: avg_over_time(liquidsoap_output_lufs_clean[7d])
+RULES_EOF
+
+sudo chown -R prometheus:prometheus /opt/prometheus
+
+cat <<'SERVICE_EOF' | sudo tee /etc/systemd/system/prometheus.service > /dev/null
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/opt/prometheus/prometheus \
+    --config.file=/opt/prometheus/prometheus.yml \
+    --storage.tsdb.path=/opt/prometheus/data \
+    --storage.tsdb.retention.time=30d
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+SERVICE_EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable prometheus
 
 sudo usermod -aG docker liq-user
 

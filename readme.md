@@ -2,6 +2,8 @@
 
 We use this repository when setting up new stations. It's not intended to be used by itself, as it requires binaries and scripts built to a certain configuration. This repository is public for the sake of making things easy.
 
+Prometheus assumes your achitecture is amd64, and your Grafana Cloud accept pushing to `prometheus-prod-39-prod-eu-north-0`. Change accordingly.
+
 ## Prerequisites
 1. Create a user that's going to run the station automation. In this example we use `liq-user`
 2. Make `liq-user` a sudoer
@@ -18,6 +20,10 @@ This build script assumes you have a Docker container already built. Refer to Co
         * CIFS host
         * GitHub username
         * GitHub PAT (Personal Access Token)
+        * Grafana cloud credentials:
+            * username
+            * server url
+            * api key
 3. Once the server has restarted, run the startup script: `bash ~/a26-setup-helpers/production/start.sh`
     * The following information is required for this step:
         * The username who you chose to be the owner of the HLS repository (in this example, `liq-user`)
