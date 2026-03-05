@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s
+rule_files:
+  - "rules/lufs.yml"
+remote_write:
+  - url: https://prometheus-prod-39-prod-eu-north-0.grafana.net/api/prom/push
+    basic_auth:
+      username: "${grafana_user}"
+      password: "${grafana_key}"
+    write_relabel_configs:
+      # Only send critical audio metrics for alerting
+      - source_labels: [__name__]
+        regex: 'liquidsoap_output_lufs_1h_avg|liquidsoap_output_lufs_24h_avg|liquidsoap_output_lufs_7d_avg|liquidsoap_output_lufs_3s|liquidsoap_dead_air.*|up|liquidsoap_rms_db'
+        action: keep
+      # Add server identification
+      - target_label: server
+        replacement: '${server_label}'
+      - target_label: environment
+        replacement: 'production'
+scrape_configs:
+  # Fast scraping for audio metrics (LUFS + RMS)
+  - job_name: 'liquidsoap_audio'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 10s
+    metric_relabel_configs:
+      - source_labels: ['__name__']
+        regex: 'liquidsoap_output_lufs_3s|liquidsoap_rms_db|liquidsoap_dead_air.*'
+        action: keep
+  # Normal scraping for other metrics
+  - job_name: 'liquidsoap_other'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+    metric_relabel_configs:
+      - source_labels: ['__name__']
+        regex: 'liquidsoap_output_lufs_3s|liquidsoap_rms_db|liquidsoap_dead_air.*'
+        action: drop

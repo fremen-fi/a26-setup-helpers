@@ -1,0 +1,26 @@
+groups:
+  - name: lufs_processing
+    interval: 30s
+    rules:
+      # Clean LUFS metric (filters out NaN, infinite, and extreme values)
+      - record: liquidsoap_output_lufs_clean
+        expr: |
+          liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
+          and on() (
+            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} == liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
+          )
+          and on() (
+            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} > -100
+          )
+          and on() (
+            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} < 50
+          )
+      # 1 hour rolling average
+      - record: liquidsoap_output_lufs_1h_avg
+        expr: avg_over_time(liquidsoap_output_lufs_clean[1h])
+      # 24 hour rolling average
+      - record: liquidsoap_output_lufs_24h_avg
+        expr: avg_over_time(liquidsoap_output_lufs_clean[24h])
+      # 7 day rolling average for long-term trends
+      - record: liquidsoap_output_lufs_7d_avg
+        expr: avg_over_time(liquidsoap_output_lufs_clean[7d])
