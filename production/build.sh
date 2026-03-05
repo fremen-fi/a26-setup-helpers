@@ -145,7 +145,7 @@ sudo chown -R prometheus:prometheus /opt/prometheus
 sudo cp prometheus.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
-sudo systemctl enable prometheus
+sudo systemctl enable prometheus --now
 
 sudo usermod -aG docker liq-user
 
