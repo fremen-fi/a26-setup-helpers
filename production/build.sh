@@ -4,7 +4,7 @@ set -e
 
 CORES=$(nproc)
 
-echo "=== AirCore A26 Host Installer ==="
+echo "=== AirCore A2x Host Installer ==="
 echo "Using $CORES cores."
 echo ""
 echo "WARNING: The server will reboot after this installer completes."
