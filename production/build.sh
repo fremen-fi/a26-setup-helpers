@@ -3,7 +3,7 @@
 set -e
 
 sudo systemctl stop prometheus
-sudo umount /radio /radio-util
+sudo umount /radio /radio-util || :
 
 CORES=$(nproc)
 
@@ -140,7 +140,8 @@ rm -rf /tmp/prometheus-${PROM_VERSION}* /tmp/${PROM_TAR}
 
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin prometheus || true
 
-sudo cp prom/prometheus.yml /opt/prometheus/
+export grafana_user grafana_key server_label
+envsubst '${grafana_user} ${grafana_key} ${server_label}' < prom/prometheus.yml | sudo tee /opt/prometheus/prometheus.yml > /dev/null
 sudo cp prom/lufs.yml /opt/prometheus/rules/
 
 sudo chown -R prometheus:prometheus /opt/prometheus
