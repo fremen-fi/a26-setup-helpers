@@ -28,6 +28,9 @@ services:
     # Prometheus exporter port (if liquidsoap exposes one)
     # - "127.0.0.1:9090:9090"
 
+    environment:
+      - TZ=Europe/Helsinki
+
     logging:
       driver: journald
       options:
