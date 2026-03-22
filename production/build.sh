@@ -2,6 +2,9 @@
 
 set -e
 
+sudo systemctl stop prometheus
+sudo umount /radio /radio-util
+
 CORES=$(nproc)
 
 echo "=== AirCore A2x Host Installer ==="
