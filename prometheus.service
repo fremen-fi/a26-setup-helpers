@@ -10,7 +10,8 @@ Type=simple
 ExecStart=/opt/prometheus/prometheus \
     --config.file=/opt/prometheus/prometheus.yml \
     --storage.tsdb.path=/opt/prometheus/data \
-    --storage.tsdb.retention.time=30d
+    --storage.tsdb.retention.time=30d \
+    --web.listen-address=127.0.0.1:9100
 Restart=always
 RestartSec=5
 
