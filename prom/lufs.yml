@@ -6,15 +6,13 @@ groups:
       - record: liquidsoap_output_lufs_clean
         expr: |
           liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
-          and on() (
-            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} == liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
-          )
-          and on() (
-            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} > -100
-          )
-          and on() (
-            liquidsoap_output_lufs_3s{job="liquidsoap_audio"} < 50
-          )
+            > -100
+          and
+          liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
+            < 50
+          and
+          liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
+            == bool liquidsoap_output_lufs_3s{job="liquidsoap_audio"}
       # 1 hour rolling average
       - record: liquidsoap_output_lufs_1h_avg
         expr: avg_over_time(liquidsoap_output_lufs_clean[1h])
