@@ -2,7 +2,7 @@
 
 set -e
 
-sudo systemctl stop prometheus
+sudo systemctl stop prometheus || :
 sudo umount /radio /radio-util || :
 
 CORES=$(nproc)
