@@ -95,17 +95,19 @@ sudo mkdir -p /opt/archive
 sudo touch /opt/archive/.keep
 sudo chown -R 1001:1001 /opt/archive
 
+# write to apache envvars (must happen BEFORE apache starts/reloads,
+# otherwise SetEnvIfNoCase in 000-default.conf gets an empty regex and fails)
+echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/null
+
 # Apache config
 sudo cp 000-default.conf /etc/apache2/sites-available/000-default.conf
-sudo systemctl reload apache2
+# restart (not reload) so /etc/apache2/envvars gets re-sourced
+sudo systemctl daemon-reload
+
+sudo systemctl restart apache2
 
 # systemd
 sudo cp a26-archiver.service /etc/systemd/system/
-sudo systemctl daemon-reload
-
-# write to apache envvars
-echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/null
-sudo systemctl reload apache2
 
 # CIFS credentials file
 printf "username=%s\npassword=%s\n" "$cifs_user" "$cifs_password" \
