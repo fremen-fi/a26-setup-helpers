@@ -23,9 +23,13 @@ while true; do
     [[ "$confirm" =~ ^[yY]$ ]] && break
 done
 
-printf "GitHub PAT: "
-read -r -s git_pat
-echo ""
+while true; do
+    printf "GitHub PAT: "
+    read -r -s git_pat
+    echo ""
+    [[ -n "$git_pat" ]] && break
+    echo "PAT cannot be empty."
+done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -44,9 +48,15 @@ echo "--- Pulling utility scripts ---"
 
 get_asset_url() {
   local name=$1
-  curl -s -H "Authorization: token $git_pat" \
-    "https://api.github.com/repos/$git_user/$git_repo_name/releases?per_page=50" \
-    | jq -r "[.[] | .assets[] | select(.name==\"$name\")][0].url"
+  local response
+  response=$(curl -sS -H "Authorization: token $git_pat" \
+    "https://api.github.com/repos/$git_user/$git_repo_name/releases?per_page=50")
+  if ! echo "$response" | jq -e 'type == "array"' >/dev/null 2>&1; then
+    echo "ERROR: GitHub API did not return a releases array. Response:" >&2
+    echo "$response" >&2
+    return 1
+  fi
+  echo "$response" | jq -r "[.[] | .assets[]? | select(.name==\"$name\")][0].url"
 }
 
 download_asset() {
