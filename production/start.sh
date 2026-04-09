@@ -68,10 +68,13 @@ download_asset() {
     echo "ERROR: could not resolve asset URL for '$name'" >&2
     return 1
   fi
+  local tmp
+  tmp=$(sudo mktemp "${dest}.XXXXXX")
   sudo curl -fsSL -H "Authorization: token $git_pat" \
     -H "Accept: application/octet-stream" \
-    "$url" -o "$dest"
-  sudo chmod +x "$dest"
+    "$url" -o "$tmp"
+  sudo chmod +x "$tmp"
+  sudo mv -f "$tmp" "$dest"
 }
 
 echo "Testing asset resolution..."
@@ -88,3 +91,4 @@ crontab -u $username ~/a26-setup-helpers/crontab
 
 echo "--- starting systemd services ---"
 sudo systemctl enable a26-archiver --now
+sudo systemctl restart a26-archiver
