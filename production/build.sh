@@ -89,11 +89,13 @@ sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2 jq
 sudo mkdir -p /var/www/hls
 sudo touch /var/www/hls/.keep
 sudo chown -R 1001:1001 /var/www/hls
+sudo chmod 777 /var/www/hls
 
 # Audio log directory
 sudo mkdir -p /opt/archive
 sudo touch /opt/archive/.keep
 sudo chown -R 1001:1001 /opt/archive
+sudo chmod 777 /opt/archive
 
 # write to apache envvars (must happen BEFORE apache starts/reloads,
 # otherwise SetEnvIfNoCase in 000-default.conf gets an empty regex and fails)
