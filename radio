@@ -1,0 +1,7 @@
+/var/log/radio-10.log {
+    monthly
+    rotate 13
+    olddir /radio-util/log
+    missingok
+    copytruncate
+}
