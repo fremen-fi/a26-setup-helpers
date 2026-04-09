@@ -109,6 +109,9 @@ sudo systemctl restart apache2
 # systemd
 sudo cp a26-archiver.service /etc/systemd/system/
 
+# logrotate
+sudo cp radio /etc/logrotate.d/
+
 # CIFS credentials file
 printf "username=%s\npassword=%s\n" "$cifs_user" "$cifs_password" \
     | sudo tee /etc/cifs-credentials > /dev/null
