@@ -108,7 +108,13 @@ sudo systemctl daemon-reload
 
 sudo systemctl restart apache2
 
-# systemd
+### ARCHIVER (SEE JIRA INC#96)
+# archiver service account — must be UID 1001 to own files written by the
+# in-container liq-user (also UID 1001), so the archiver can manage /opt/archive
+sudo groupadd -g 1001 a26arc 2>/dev/null || true
+sudo useradd -u 1001 -g 1001 -r -s /usr/sbin/nologin -M -d /opt/archive a26arc 2>/dev/null || true
+sudo usermod -aG liq-user a26arc
+
 sudo cp a26-archiver.service /etc/systemd/system/
 
 # logrotate
@@ -122,8 +128,8 @@ sudo chmod 600 /etc/cifs-credentials
 # fstab mounts
 sudo mkdir -p /radio /radio-util
 
-FSTAB_RADIO="//${cifs_server}/backup/radio /radio cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
-FSTAB_UTIL="//${cifs_server}/backup /radio-util cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},_netdev 0 0"
+FSTAB_RADIO="//${cifs_server}/backup/radio /radio cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},dir_mode=0775,file_mode=0664,_netdev 0 0"
+FSTAB_UTIL="//${cifs_server}/backup /radio-util cifs credentials=/etc/cifs-credentials,ro,uid=${HLS_OWNER},gid=${HLS_OWNER},dir_mode=0775,file_mode=0664,_netdev 0 0"
 
 grep -q "/radio cifs" /etc/fstab || echo "$FSTAB_RADIO" | sudo tee -a /etc/fstab > /dev/null
 grep -q "/radio-util cifs" /etc/fstab || echo "$FSTAB_UTIL" | sudo tee -a /etc/fstab > /dev/null
