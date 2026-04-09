@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 echo "=== AirCore A26 Station Deploy ==="
 echo ""
 
@@ -20,6 +22,10 @@ while true; do
     read -r confirm
     [[ "$confirm" =~ ^[yY]$ ]] && break
 done
+
+printf "GitHub PAT: "
+read -r -s git_pat
+echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -48,7 +54,11 @@ download_asset() {
   local dest=$2
   local url
   url=$(get_asset_url "$name")
-  sudo curl -sL -H "Authorization: token $git_pat" \
+  if [[ -z "$url" || "$url" == "null" ]]; then
+    echo "ERROR: could not resolve asset URL for '$name'" >&2
+    return 1
+  fi
+  sudo curl -fsSL -H "Authorization: token $git_pat" \
     -H "Accept: application/octet-stream" \
     "$url" -o "$dest"
   sudo chmod +x "$dest"
