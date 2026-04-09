@@ -5,7 +5,8 @@ Documentation=WITHHELD
 
 [Service]
 Type=simple
-User=liq-user
+User=a26arc
+Group=a26arc
 WorkingDirectory=/opt/archive
 ExecStart=/usr/local/bin/archiver
 Restart=always
