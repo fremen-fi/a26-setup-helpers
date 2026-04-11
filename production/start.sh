@@ -33,6 +33,9 @@ done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+echo "Logging in to ghcr.io..."
+echo "$git_pat" | docker login ghcr.io -u "$git_user" --password-stdin
+
 echo "Pulling image..."
 docker pull "ghcr.io/$git_user/$git_repo_name:latest"
 
