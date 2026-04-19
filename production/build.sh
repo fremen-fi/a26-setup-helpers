@@ -104,6 +104,9 @@ echo "export HLS_TOKEN=$hls_token" | sudo tee -a /etc/apache2/envvars > /dev/nul
 # Apache config
 sudo cp 000-default.conf /etc/apache2/sites-available/000-default.conf
 # restart (not reload) so /etc/apache2/envvars gets re-sourced
+sudo a2enmod rewrite
+sudo a2enmod ssl
+
 sudo systemctl daemon-reload
 
 sudo systemctl restart apache2
