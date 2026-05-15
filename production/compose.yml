@@ -1,23 +1,23 @@
 services:
   radio-10:
-    image: ghcr.io/mikasappi/radio-10:latest
+    image: radio-10:latest
     container_name: radio-10
     restart: unless-stopped
 
     volumes:
-      # Audio content from CIFS (mounted on host via fstab)
-      - /radio:/radio:ro
-      - /radio-util:/radio-util:ro
       # HLS segments served by host Apache
       - /var/www/hls:/var/www/hls:rw
       # Liquidsoap socket (for telnet/monitoring access from host)
       - /run/liquidsoap:/run/liquidsoap:rw
-      # log path
-      - /var/log/radio-10.log:/var/log/radio-10.log
-      # audio log
-      - /opt/archive:/opt/archive:rw
+      # TMP for Edge
+      - /tmp/aircore-edge:/tmp/aircore-edge:rw
+      - /tmp:/tmp:rw
+      # cache for Edge
+      - /var/cache/aircore-edge:/var/cache/aircore-edge:rw
+      # log
+      - /var/log/radio-10:/var/log/radio-10:rw
 
-    # Optional: override script path without rebuilding (hotfixes)
+    # Optional: override script path without rebuilding
     # environment:
     #   LIQ_SCRIPT: /home/liq-user/Radio-10/script/prod.liq
 
@@ -25,11 +25,8 @@ services:
     ports:
       - "127.0.0.1:1234:1234"
 
-    # Liquidsoap Prometheus exporter
-      - "127.0.0.1:9090:9090"
-
-    environment:
-      - TZ=Europe/Helsinki
+    # Prometheus exporter port (if liquidsoap exposes one)
+    # - "127.0.0.1:9090:9090"
 
     logging:
       driver: journald

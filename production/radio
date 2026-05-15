@@ -1,0 +1,11 @@
+/var/log/radio-10/radio-10.log {
+    daily
+    rotate 14
+    size 100M
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    su root root
+}

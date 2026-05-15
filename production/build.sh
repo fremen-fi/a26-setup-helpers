@@ -169,8 +169,9 @@ sudo systemctl enable prometheus --now
 
 sudo usermod -aG docker liq-user
 
-sudo touch /var/log/radio-10.log
-sudo chown 1001:1001 /var/log/radio-10.log
+sudo mkdir -p /var/log/radio-10
+sudo touch /var/log/radio-10/radio-10.log
+sudo chown -R 1001:1001 /var/log/radio-10
 
 # Docker login
 echo "$git_pat" | docker login ghcr.io -u "$git_user" --password-stdin
