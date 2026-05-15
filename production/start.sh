@@ -16,6 +16,9 @@ sudo chown -R 1001:1001 /var/log/radio-10
 sudo groupadd -r aircore-edge 2>/dev/null || true
 sudo useradd -r -g aircore-edge -s /usr/sbin/nologin -M -d /var/cache/aircore-edge aircore-edge 2>/dev/null || true
 
+sudo mkdir -p /var/lib/aircore-edge /tmp/aircore-edge
+sudo chown aircore-edge:aircore-edge /var/lib/aircore-edge /tmp/aircore-edge
+
 while true; do
     printf "What was the username you chose to be the owner of the HLS directory?: "
     read -r username
