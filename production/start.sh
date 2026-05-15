@@ -9,6 +9,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 sudo cp "$SCRIPT_DIR/radio" /etc/logrotate.d/radio
 
+sudo mkdir -p /var/log/radio-10
+sudo touch /var/log/radio-10/radio-10.log
+sudo chown -R 1001:1001 /var/log/radio-10
+
 while true; do
     printf "What was the username you chose to be the owner of the HLS directory?: "
     read -r username
