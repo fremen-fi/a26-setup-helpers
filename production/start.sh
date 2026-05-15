@@ -5,6 +5,8 @@ set -euo pipefail
 echo "=== AirCore A26 Station Deploy ==="
 echo ""
 
+cp radio /etc/logrotate.d/ || :
+
 while true; do
     printf "What was the username you chose to be the owner of the HLS directory?: "
     read -r username
