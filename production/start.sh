@@ -5,14 +5,16 @@ set -euo pipefail
 echo "=== AirCore A26 Station Deploy ==="
 echo ""
 
-cp radio /etc/logrotate.d/ || :
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+sudo cp "$SCRIPT_DIR/radio" /etc/logrotate.d/radio
 
 while true; do
     printf "What was the username you chose to be the owner of the HLS directory?: "
     read -r username
     printf "user: $username. Correct? (Y/N) "
     read -r confirm_username
-    [[ ""$confirm_username =~ ^[yY]$ ]] && break
+    [[ "$confirm_username" =~ ^[yY]$ ]] && break
 done
 
 while true; do
@@ -33,13 +35,14 @@ while true; do
     echo "PAT cannot be empty."
 done
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RADIO_IMAGE="ghcr.io/$git_user/$git_repo_name:latest"
+export RADIO_IMAGE
 
 echo "Logging in to ghcr.io..."
 echo "$git_pat" | docker login ghcr.io -u "$git_user" --password-stdin
 
 echo "Pulling image..."
-docker pull "ghcr.io/$git_user/$git_repo_name:latest"
+docker pull "$RADIO_IMAGE"
 
 echo "Starting container..."
 docker compose -f "$SCRIPT_DIR/compose.yml" up -d
