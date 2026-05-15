@@ -83,7 +83,7 @@ echo "--- Starting installation ---"
 
 # apt
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2 jq
+sudo apt install -y docker.io docker-compose-v2 cifs-utils apache2 jq libopus0 libopusfile0
 
 # HLS directory
 sudo mkdir -p /var/www/hls
