@@ -13,6 +13,9 @@ sudo mkdir -p /var/log/radio-10
 sudo touch /var/log/radio-10/radio-10.log
 sudo chown -R 1001:1001 /var/log/radio-10
 
+sudo groupadd -r aircore-edge 2>/dev/null || true
+sudo useradd -r -g aircore-edge -s /usr/sbin/nologin -M -d /var/cache/aircore-edge aircore-edge 2>/dev/null || true
+
 while true; do
     printf "What was the username you chose to be the owner of the HLS directory?: "
     read -r username
@@ -95,9 +98,21 @@ echo "Resolved URL: $url"
 
 download_asset "archiver"    /usr/local/bin/archiver
 
+echo "--- downloading audio_bridge ---"
+sudo curl -fsSL \
+    "https://frm-sw-storage.s3.rbx.io.cloud.ovh.net/ac-edge/audio_bridge" \
+    -o /usr/local/bin/audio_bridge
+sudo chmod +x /usr/local/bin/audio_bridge
+
+echo "--- installing systemd units ---"
+sudo cp "$SCRIPT_DIR/../aircore-edge-bridge.service" /etc/systemd/system/aircore-edge-bridge.service
+sudo systemctl daemon-reload
+
 echo "--- writing crontab ---"
 crontab -u $username ~/a26-setup-helpers/crontab
 
 echo "--- starting systemd services ---"
 sudo systemctl enable a26-archiver --now
 sudo systemctl restart a26-archiver
+sudo systemctl enable aircore-edge-bridge --now
+sudo systemctl restart aircore-edge-bridge

@@ -1,0 +1,35 @@
+[Unit]
+Description=AirCore Edge — WebRTC ↔ Liquidsoap audio bridge
+After=network-online.target
+Wants=network-online.target
+Before=liquidsoap.service
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/aircore-edge/secret.env
+Environment=AUDIO_BRIDGE_LISTEN=0.0.0.0:8082
+Environment=AUDIO_BRIDGE_PCM_IN=/tmp/aircore-edge/onair.pcm
+Environment=AUDIO_BRIDGE_PCM_OUT=/tmp/aircore-edge/mic.pcm
+Environment=AUDIO_BRIDGE_ALLOWED_ORIGINS=*
+Environment=AUDIO_BRIDGE_LIBRARY_DB=/var/lib/aircore-edge/library.db
+Environment=AUDIO_BRIDGE_PUBLIC_BASE=http://127.0.0.1:8082
+
+User=aircore-edge
+Group=aircore-edge
+
+ExecStartPre=+/bin/mkdir -p /tmp/aircore-edge /var/lib/aircore-edge
+ExecStartPre=+/bin/chown aircore-edge:aircore-edge /tmp/aircore-edge /var/lib/aircore-edge
+ExecStartPre=+/bin/chmod 0755 /tmp/aircore-edge /var/lib/aircore-edge
+ExecStart=/usr/local/bin/audio_bridge
+Restart=on-failure
+RestartSec=2
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/tmp /var/lib/aircore-edge
+CacheDirectory=aircore-edge
+CacheDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
