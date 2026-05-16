@@ -21,13 +21,9 @@ services:
     # environment:
     #   LIQ_SCRIPT: /home/liq-user/Radio-10/script/prod.liq
 
-    # Liquidsoap telnet port — bind to localhost only
-    ports:
-      - "127.0.0.1:1234:1234"
-      - "127.0.0.1:8082:8082"
-
-    # Prometheus exporter port (if liquidsoap exposes one)
-    # - "127.0.0.1:9090:9090"
+    # Share host network so liq can reach audio_bridge on 127.0.0.1:8082
+    # and host can reach liq telnet on 127.0.0.1:1234
+    network_mode: host
 
     logging:
       driver: journald
