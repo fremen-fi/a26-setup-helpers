@@ -15,7 +15,7 @@ sudo mkdir -p /var/log/radio-10
 sudo touch /var/log/radio-10/radio-10.log
 sudo chown -R 1001:1001 /var/log/radio-10
 
-sudo mkdir /etc/aircore-edge/
+sudo mkdir -p /etc/aircore-edge/
 sudo chown -R aircore-edge:aircore-edge /etc/aircore-edge
 
 sudo groupadd -r aircore-edge 2>/dev/null || true
