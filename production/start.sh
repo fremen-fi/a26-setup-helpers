@@ -107,6 +107,9 @@ echo "Resolved URL: $url"
 download_asset "archiver"    /usr/local/bin/archiver
 
 echo "--- downloading audio_bridge ---"
+# stop first so curl can overwrite the running binary (ETXTBSY otherwise);
+# the enable --now + restart below brings it back up
+sudo systemctl stop aircore-edge-bridge.service || true
 sudo curl -fsSL \
     "https://frm-sw-storage.s3.rbx.io.cloud.ovh.net/ac-edge/audio_bridge" \
     -o /usr/local/bin/audio_bridge
