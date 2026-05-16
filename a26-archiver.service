@@ -11,7 +11,7 @@ WorkingDirectory=/opt/archive
 ExecStart=/usr/local/bin/archiver
 Restart=always
 StartLimitInterval=90
-Nice=-12
+Nice=12
 
 [Install]
 WantedBy=multi-user.target
