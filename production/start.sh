@@ -111,7 +111,7 @@ echo "--- downloading audio_bridge ---"
 # the enable --now + restart below brings it back up
 sudo systemctl stop aircore-edge-bridge.service || true
 sudo curl -fsSL \
-    "https://frm-sw-storage.s3.rbx.io.cloud.ovh.net/ac-edge/audio_bridge" \
+    "https://github.com/fremen-fi/aircore-edge/releases/latest/download/audio_bridge-linux-amd64" \
     -o /usr/local/bin/audio_bridge
 sudo chmod +x /usr/local/bin/audio_bridge
 
