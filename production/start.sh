@@ -70,10 +70,11 @@ echo ""
 echo "--- Pulling utility scripts ---"
 
 get_asset_url() {
-  local name=$1
+  local repo=$1
+  local name=$2
   local response
   response=$(curl -sS -H "Authorization: token $git_pat" \
-    "https://api.github.com/repos/$git_user/$git_repo_name/releases?per_page=50")
+    "https://api.github.com/repos/$repo/releases?per_page=50")
   if ! echo "$response" | jq -e 'type == "array"' >/dev/null 2>&1; then
     echo "ERROR: GitHub API did not return a releases array. Response:" >&2
     echo "$response" >&2
@@ -83,12 +84,13 @@ get_asset_url() {
 }
 
 download_asset() {
-  local name=$1
-  local dest=$2
+  local repo=$1
+  local name=$2
+  local dest=$3
   local url
-  url=$(get_asset_url "$name")
+  url=$(get_asset_url "$repo" "$name")
   if [[ -z "$url" || "$url" == "null" ]]; then
-    echo "ERROR: could not resolve asset URL for '$name'" >&2
+    echo "ERROR: could not resolve asset URL for '$repo' / '$name'" >&2
     return 1
   fi
   local tmp
@@ -101,19 +103,16 @@ download_asset() {
 }
 
 echo "Testing asset resolution..."
-url=$(get_asset_url "newsweather")
+url=$(get_asset_url "$git_user/$git_repo_name" "newsweather")
 echo "Resolved URL: $url"
 
-download_asset "archiver"    /usr/local/bin/archiver
+download_asset "$git_user/$git_repo_name" "archiver" /usr/local/bin/archiver
 
 echo "--- downloading audio_bridge ---"
-# stop first so curl can overwrite the running binary (ETXTBSY otherwise);
+# stop first so the binary can be overwritten (ETXTBSY otherwise);
 # the enable --now + restart below brings it back up
 sudo systemctl stop aircore-edge-bridge.service || true
-sudo curl -fsSL \
-    "https://github.com/fremen-fi/aircore-edge/releases/latest/download/audio_bridge-linux-amd64" \
-    -o /usr/local/bin/audio_bridge
-sudo chmod +x /usr/local/bin/audio_bridge
+download_asset "fremen-fi/aircore-edge" "audio_bridge-linux-amd64" /usr/local/bin/audio_bridge
 
 echo "--- installing systemd units ---"
 sudo cp "$SCRIPT_DIR/../aircore-edge-bridge.service" /etc/systemd/system/aircore-edge-bridge.service
