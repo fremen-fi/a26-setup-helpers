@@ -8,6 +8,7 @@ Type=simple
 User=a26arc
 Group=a26arc
 WorkingDirectory=/opt/archive
+EnvironmentFile=-/etc/a26-archiver.env
 ExecStart=/usr/local/bin/archiver
 Restart=always
 StartLimitInterval=90
